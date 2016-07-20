@@ -81,8 +81,7 @@ int main()
 ///////////////////////////////////////
 
     while (!f.eof()){
-            char c;
-            f>>c;
+            char c = f.get();
             m[c]++;
     }
 
@@ -120,7 +119,11 @@ int main()
 
 
    ////ZBROS_UKAZATELIA//////
-f.clean();f.seekg(0);
+f.clear();f.seekg(0);
+
+ofstream g("output.bin");
+int count= 0;char buf = 0;
+
 
 ///////////STRING//////////////////
 //   for (int i = 0; i<s.length();i++)
@@ -129,14 +132,34 @@ f.clean();f.seekg(0);
     /////STRING/////
    // char c = s[i];
    //////////////////
-   char c;
-   f>>c;
+   char c = f.get();
     vector<bool> x = table[c];
 
         for (int n=0; n<x.size();n++)
-            cout<<x[n];
-
+        {
+            buf = buf | x[n]<<(7-count);
+            count++;
+            if (count==8){count = 0; g<<buf;buf = 0;}
+        }
+            ///////STRING//////
+            //cout<<x[n];//////
+            //////////////////
 }
-    f.close();
+f.close();
+g.close();
+
+ifstream F("output.bin");
+
+Node *p = root;
+count = 0; char byte;
+F>>byte;
+while (!F.eof()){
+    bool b = byte & (1 << (7-count) );
+    if(b) p=p->right;else p=p->left;
+    if(p->left==NULL & p->right==NULL){cout<<p->c;p=root;}
+    count++;
+    if (count==8) {count=0;F>>byte;}
+}
+F.close();
     return 0;
 }
